@@ -25,7 +25,7 @@ namespace NSProgram
 			if (result == DialogResult.OK)
 			{
 				tbBook.Text = openFileDialog1.FileName;
-				Book.Load(tbBook.Text,false);
+				Book.FileAdd(tbBook.Text);
 				ShowRecords();
 				MessageBox.Show("The book has been loaded");
 			}
@@ -43,7 +43,7 @@ namespace NSProgram
 			}
 		}
 
-		private void button1_Click(object sender, EventArgs e)
+		private void ButClear_Click(object sender, EventArgs e)
 		{
 			Book.Clear();
 			ShowRecords();

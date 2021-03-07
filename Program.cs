@@ -25,9 +25,10 @@ namespace NSProgram
 			}
 			else
 			{
-				CBookUmo Book = new CBookUmo();
+				CBookUmo book = new CBookUmo();
 				CUci Uci = new CUci();
 				CChess Chess = new CChess();
+				bool isWritable = false;
 				bool bookRead = false;
 				int bookLimitW = 0xf;
 				int bookLimitR = 0;
@@ -47,6 +48,10 @@ namespace NSProgram
 						case "-lr":
 						case "-lw":
 							ax = ac;
+							break;
+						case "-w":
+							ax = ac;
+							isWritable = true;
 							break;
 						default:
 							switch (ax)
@@ -70,16 +75,14 @@ namespace NSProgram
 							break;
 					}
 				}
-				string book = String.Join(" ", listBn);
-				string engine = String.Join(" ", listEf);
+				string bookName = String.Join(" ", listBn);
+				string engineName = String.Join(" ", listEf);
 				string arguments = String.Join(" ", listEa);
-				if (book == "")
-					book = Path.GetFileNameWithoutExtension(engine);
 				Process myProcess = new Process();
-				if (File.Exists(engine))
+				if (File.Exists(engineName))
 				{
-					myProcess.StartInfo.FileName = engine;
-					myProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(engine);
+					myProcess.StartInfo.FileName = engineName;
+					myProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(engineName);
 					myProcess.StartInfo.UseShellExecute = false;
 					myProcess.StartInfo.RedirectStandardInput = true;
 					myProcess.StartInfo.Arguments = arguments;
@@ -87,62 +90,94 @@ namespace NSProgram
 				}
 				else
 				{
-					if (engine != "")
+					if (engineName != String.Empty)
 						Console.WriteLine("info string missing engine");
-					engine = "";
+					engineName = String.Empty;
 				}
-				if (!Book.Load(book))
-					if (!Book.Load($"{book}{CBookUmo.defExt}"))
-						if (!Book.Load($"{book}.uci"))
-							if (!Book.Load($"{book}.pgn"))
-								Console.WriteLine($"info string missing book {book}");
+				if (!book.Load(bookName))
+					if (!book.Load($"{bookName}{CBookUmo.defExt}"))
+						if (!book.Load($"{bookName}.uci"))
+							if (!book.Load($"{bookName}.pgn"))
+								Console.WriteLine($"info string missing book {bookName}");
 				while (true)
 				{
 					string msg = Console.ReadLine();
 					Uci.SetMsg(msg);
-					if ((Uci.command != "go") && (engine != ""))
+					if (Uci.command == "help")
+					{
+						Console.WriteLine("book addfile [filename].[umo|uci|png] - add moves to the book");
+						Console.WriteLine("book save [filename].[umo|uci|png] - save book to the file");
+						Console.WriteLine("book clear - clear all moves from the book");
+						continue;
+					}
+					if (Uci.command == "book")
+					{
+						if (Uci.tokens.Length > 1)
+							switch (Uci.tokens[1])
+							{
+								case "clear":
+									book.Clear();
+									break;
+								case "addfile":
+									if (!book.FileAdd(Uci.GetValue(2, 0)))
+										Console.WriteLine("File not found");
+									break;
+								case "adduci":
+									book.moves.Add(Uci.GetValue(2, 0));
+									break;
+								case "save":
+									book.Save(Uci.GetValue(2, 0));
+									break;
+								default:
+									Console.WriteLine($"Unknown command [{Uci.tokens[1]}]");
+									break;
+							}
+						continue;
+					}
+					if ((Uci.command != "go") && (engineName != String.Empty))
 						myProcess.StandardInput.WriteLine(msg);
 					switch (Uci.command)
 					{
 						case "position":
 							bookRead = false;
 							movesUci.Clear();
-							Chess.SetFen("");
-							if (Uci.GetIndex("fen", 0) == 0)
+							Chess.SetFen();
+							if (Uci.GetIndex("fen") < 0)
 							{
 								bookRead = true;
 								int m = Uci.GetIndex("moves", Uci.tokens.Length);
-								for (int n = m; n < Uci.tokens.Length; n++)
+								for (int n = m + 1; n < Uci.tokens.Length; n++)
 								{
 									string umo = Uci.tokens[n];
 									movesUci.Add(umo);
 									int emo = Chess.UmoToEmo(umo);
 									Chess.MakeMove(emo);
 								}
-								if ((bookLimitW > 0) && Chess.Is2ToEnd(out string mm, out string em))
+								if (isWritable && Chess.Is2ToEnd(out string mm, out string em))
 								{
 									movesUci.Add(mm);
 									movesUci.Add(em);
-									List<string> l = movesUci.GetRange(0, bookLimitW);
+									int count = bookLimitW > 0 ? bookLimitW : movesUci.Count;
+									List<string> l = movesUci.GetRange(0, count);
 									string lm = String.Join(" ", l);
-									Book.moves.Add(lm);
-									Book.Save(book);
+									book.moves.Add(lm);
+									book.Save();
 								}
 							}
 							break;
 						case "go":
-							string move = "";
+							string move = String.Empty;
 							if (bookRead && ((movesUci.Count < bookLimitR) || (bookLimitR == 0)))
 							{
 								string moves = String.Join(" ", movesUci);
-								move = Book.GetMove(moves);
+								move = book.GetMove(moves);
 							}
-							if (move != "")
+							if (move != String.Empty)
 							{
 								Console.WriteLine("info string book");
 								Console.WriteLine($"bestmove {move}");
 							}
-							else if (engine == "")
+							else if (engineName == String.Empty)
 								Console.WriteLine("enginemove");
 							else
 								myProcess.StandardInput.WriteLine(msg);

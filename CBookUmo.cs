@@ -8,23 +8,28 @@ namespace RapBookUci
 {
 	public class CBookUmo
 	{
-		string path = "";
 		public const string defExt = ".umo";
-		string name = "BookReaderUmo";
+		string path = $"Book{defExt}";
+		readonly string name = "BookReaderUmo";
 		readonly string version = "2020-12-01";
 		public List<string> moves = new List<string>();
-		private static readonly Random random = new Random();
 		readonly CChess Chess = new CChess();
+
+		void ShowCountLines()
+		{
+			Console.WriteLine($"info string book {moves.Count:N0} lines");
+		}
 
 		public void Clear()
 		{
 			moves.Clear();
+			ShowCountLines();
 		}
 
 		public string GetMove(string m)
 		{
 			if (moves.Count < 1)
-				return "";
+				return String.Empty;
 			int indexL = 0;
 			int indexH = moves.Count - 1;
 			m = m.Trim();
@@ -34,7 +39,7 @@ namespace RapBookUci
 				{
 					indexL++;
 					if (indexL > indexH)
-						return "";
+						return String.Empty;
 				}
 				while (moves[indexH].IndexOf(m) != 0)
 				{
@@ -43,7 +48,7 @@ namespace RapBookUci
 						return "";
 				}
 			}
-			int index = random.Next(indexL, indexH + 1);
+			int index = CChess.random.Next(indexL, indexH + 1);
 			string[] mo = m.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 			string[] mr = moves[index].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 			if (mr.Length > mo.Length)
@@ -54,7 +59,7 @@ namespace RapBookUci
 		void DeleteDuplicates(List<string> ml)
 		{
 			ml.Sort();
-			string last = "";
+			string last = String.Empty;
 			for (int n = ml.Count - 1; n >= 0; n--)
 			{
 				string m = ml[n];
@@ -77,23 +82,28 @@ namespace RapBookUci
 
 		}
 
-		public bool Load(string p, bool clear = true)
+		public bool Load(string p)
+		{
+			path = p;
+			moves.Clear();
+			return FileAdd(p);
+		}
+
+		public bool FileAdd(string p)
 		{
 			bool result = false;
-			path = p;
-			if (clear)
-				moves.Clear();
-			if (File.Exists(path))
+			if (File.Exists(p))
 			{
-				string ext = Path.GetExtension(path);
+				string ext = Path.GetExtension(p);
 				if (ext == ".pgn")
 					LoadPgn();
 				else
 				{
-					var list = File.ReadAllLines(path).ToList();
+					var list = File.ReadAllLines(p).ToList();
 					CheckVersion(list);
 					moves.AddRange(list);
 				}
+				ShowCountLines();
 				result = true;
 			}
 			return result;
@@ -111,13 +121,13 @@ namespace RapBookUci
 					continue;
 				string[] arrMoves = cm.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 				Chess.SetFen();
-				string movesUci = "";
+				string movesUci = String.Empty;
 				foreach (string san in arrMoves)
 				{
 					if (Char.IsDigit(san[0]))
 						continue;
 					string umo = Chess.SanToUmo(san);
-					if (umo == "")
+					if (umo == String.Empty)
 						break;
 					movesUci += $" {umo}";
 					int emo = Chess.UmoToEmo(umo);
@@ -127,11 +137,16 @@ namespace RapBookUci
 			}
 		}
 
+		public void Save()
+		{
+			Save(path);
+		}
+
 		public void Save(string p)
 		{
 			path = p;
 			string ext = Path.GetExtension(path);
-			if(ext == "")
+			if(ext == String.Empty)
 			{
 				ext = defExt;
 				path += defExt;
@@ -185,11 +200,11 @@ namespace RapBookUci
 			{
 				string[] arrMoves = m.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 				Chess.SetFen();
-				string png = "";
+				string png = String.Empty;
 				foreach (string umo in arrMoves)
 				{
 					string san = Chess.UmoToSan(umo);
-					if (san == "")
+					if (san == String.Empty)
 						break;
 					int number = (Chess.g_moveNumber >> 1) + 1;
 					if (Chess.whiteTurn)
@@ -199,10 +214,10 @@ namespace RapBookUci
 					int emo = Chess.UmoToEmo(umo);
 					Chess.MakeMove(emo);
 				}
-				listPgn.Add("");
+				listPgn.Add(String.Empty);
 				listPgn.Add("[White \"White\"]");
 				listPgn.Add("[Black \"Black\"]");
-				listPgn.Add("");
+				listPgn.Add(String.Empty);
 				listPgn.Add(png.Trim());
 			}
 			File.WriteAllLines(path, listPgn);

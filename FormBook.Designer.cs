@@ -33,7 +33,7 @@
 			this.butSave = new System.Windows.Forms.Button();
 			this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
 			this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-			this.button1 = new System.Windows.Forms.Button();
+			this.butClear = new System.Windows.Forms.Button();
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.tsslRecords = new System.Windows.Forms.ToolStripStatusLabel();
 			this.statusStrip1.SuspendLayout();
@@ -79,15 +79,15 @@
 			this.saveFileDialog1.DefaultExt = "umo";
 			this.saveFileDialog1.Filter = "BookReaderUmo|*.umo|Universal Chess Interface|*.uci|Portable Game Notation|*.pgn";
 			// 
-			// button1
+			// butClear
 			// 
-			this.button1.Location = new System.Drawing.Point(249, 39);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(94, 21);
-			this.button1.TabIndex = 4;
-			this.button1.Text = "Clear";
-			this.button1.UseVisualStyleBackColor = true;
-			this.button1.Click += new System.EventHandler(this.button1_Click);
+			this.butClear.Location = new System.Drawing.Point(249, 39);
+			this.butClear.Name = "butClear";
+			this.butClear.Size = new System.Drawing.Size(94, 21);
+			this.butClear.TabIndex = 4;
+			this.butClear.Text = "Clear";
+			this.butClear.UseVisualStyleBackColor = true;
+			this.butClear.Click += new System.EventHandler(this.ButClear_Click);
 			// 
 			// statusStrip1
 			// 
@@ -111,7 +111,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(565, 89);
 			this.Controls.Add(this.statusStrip1);
-			this.Controls.Add(this.button1);
+			this.Controls.Add(this.butClear);
 			this.Controls.Add(this.butSave);
 			this.Controls.Add(this.butLoad);
 			this.Controls.Add(this.tbBook);
@@ -131,7 +131,7 @@
 		private System.Windows.Forms.Button butSave;
 		private System.Windows.Forms.OpenFileDialog openFileDialog1;
 		private System.Windows.Forms.SaveFileDialog saveFileDialog1;
-		private System.Windows.Forms.Button button1;
+		private System.Windows.Forms.Button butClear;
 		private System.Windows.Forms.StatusStrip statusStrip1;
 		private System.Windows.Forms.ToolStripStatusLabel tsslRecords;
 	}
