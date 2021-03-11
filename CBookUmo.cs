@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using NSChess;
 
-namespace RapBookUci
+namespace NSProgram
 {
 	public class CBookUmo
 	{
@@ -13,7 +13,7 @@ namespace RapBookUci
 		readonly string name = "BookReaderUmo";
 		readonly string version = "2020-12-01";
 		public List<string> moves = new List<string>();
-		readonly CChess Chess = new CChess();
+		readonly CChessExt Chess = new CChessExt();
 
 		void ShowCountLines()
 		{
@@ -63,7 +63,7 @@ namespace RapBookUci
 			for (int n = ml.Count - 1; n >= 0; n--)
 			{
 				string m = ml[n];
-				if(last.IndexOf(m) == 0)
+				if (last.IndexOf(m) == 0)
 					ml.RemoveAt(n);
 				last = m;
 			}
@@ -79,7 +79,8 @@ namespace RapBookUci
 			string line = list[0];
 			if (line.Contains(name))
 				list.RemoveAt(0);
-
+			else
+				DeleteDuplicates(list);
 		}
 
 		public bool Load(string p)
@@ -135,6 +136,7 @@ namespace RapBookUci
 				}
 				moves.Add(movesUci.Trim());
 			}
+			DeleteDuplicates(moves);
 		}
 
 		public void Save()
@@ -146,7 +148,7 @@ namespace RapBookUci
 		{
 			path = p;
 			string ext = Path.GetExtension(path);
-			if(ext == String.Empty)
+			if (ext == String.Empty)
 			{
 				ext = defExt;
 				path += defExt;
@@ -198,7 +200,7 @@ namespace RapBookUci
 			List<string> listPgn = new List<string>();
 			foreach (string m in moves)
 			{
-				string[] arrMoves = m.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+				string[] arrMoves = m.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 				Chess.SetFen();
 				string png = String.Empty;
 				foreach (string umo in arrMoves)
