@@ -85,11 +85,11 @@ namespace NSProgram
 				if (!Book.Load($"{bookName}{CBookUmo.defExt}"))
 					if (!Book.Load($"{bookName}.uci"))
 						Book.Load($"{bookName}.pgn");
-			Console.WriteLine($"{Book.moves.Count:N0} lines in the book");
+			Console.WriteLine($"info string book {Book.moves.Count:N0} lines");
 			while (true)
 			{
 				string msg = Console.ReadLine().Trim();
-				if ((msg == "help") || (msg == "book"))
+				if (String.IsNullOrEmpty(msg) || (msg == "help") || (msg == "book"))
 				{
 					Console.WriteLine("book load [filename].[umo|uci|png] - clear and add moves from file");
 					Console.WriteLine("book save [filename].[umo|uci|png] - save book to the file");
