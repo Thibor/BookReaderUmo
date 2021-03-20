@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NSChess;
 
 namespace NSProgram
@@ -87,17 +88,17 @@ namespace NSProgram
 		{
 			path = p;
 			moves.Clear();
-			return FileAdd(p);
+			return AddFile(p);
 		}
 
-		public bool FileAdd(string p)
+		public bool AddFile(string p)
 		{
 			bool result = false;
 			if (File.Exists(p))
 			{
 				string ext = Path.GetExtension(p);
 				if (ext == ".pgn")
-					LoadPgn();
+					AddFilePgn(p);
 				else
 				{
 					var list = File.ReadAllLines(p).ToList();
@@ -110,9 +111,9 @@ namespace NSProgram
 			return result;
 		}
 
-		void LoadPgn()
+		void AddFilePgn(string p)
 		{
-			List<string> listPgn = File.ReadAllLines(path).ToList();
+			List<string> listPgn = File.ReadAllLines(p).ToList();
 			foreach (string m in listPgn)
 			{
 				string cm = m.Trim();
@@ -120,6 +121,7 @@ namespace NSProgram
 					continue;
 				if (cm[0] == '[')
 					continue;
+				cm = Regex.Replace(cm, @"\.(?! |$)", ". ");
 				string[] arrMoves = cm.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 				Chess.SetFen();
 				string movesUci = String.Empty;

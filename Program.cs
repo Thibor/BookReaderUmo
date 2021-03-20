@@ -17,7 +17,7 @@ namespace NSProgram
 			CChessExt Chess = new CChessExt();
 			bool isWritable = false;
 			bool bookRead = false;
-			int bookLimitW = 0xf;
+			int bookLimitW = 0;
 			int bookLimitR = 0;
 			string ax = "-bn";
 			List<string> movesUci = new List<string>();
@@ -105,7 +105,7 @@ namespace NSProgram
 					switch (Uci.tokens[1])
 					{
 						case "addfile":
-							if (!Book.FileAdd(Uci.GetValue(2, 0)))
+							if (!Book.AddFile(Uci.GetValue(2, 0)))
 								Console.WriteLine("File not found");
 							else
 								Console.WriteLine($"{(Book.moves.Count - count):N0} lines have been added");
