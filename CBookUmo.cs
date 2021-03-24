@@ -16,6 +16,11 @@ namespace NSProgram
 		public List<string> moves = new List<string>();
 		readonly CChessExt Chess = new CChessExt();
 
+		public void AddUci(string uci)
+		{
+			moves.Add(uci);
+		}
+
 		void ShowCountLines()
 		{
 			Console.WriteLine($"info string book {moves.Count:N0} lines");

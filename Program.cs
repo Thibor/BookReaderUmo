@@ -53,10 +53,10 @@ namespace NSProgram
 								listEa.Add(ac);
 								break;
 							case "-lr":
-								bookLimitR = int.Parse(ac);
+								bookLimitR = int.TryParse(ac, out int lr) ? lr : 0;
 								break;
 							case "-lw":
-								bookLimitW = int.Parse(ac);
+								bookLimitW = int.TryParse(ac, out int lw) ? lw : 0;
 								break;
 						}
 						break;
@@ -160,14 +160,14 @@ namespace NSProgram
 								int c = bookLimitW > 0 ? bookLimitW : movesUci.Count;
 								List<string> l = movesUci.GetRange(0, c);
 								string lm = String.Join(" ", l);
-								Book.moves.Add(lm);
+								Book.AddUci(lm);
 								Book.Save();
 							}
 						}
 						break;
 					case "go":
 						string move = String.Empty;
-						if (bookRead && ((movesUci.Count < bookLimitR) || (bookLimitR == 0)))
+						if (bookRead && ((Chess.g_moveNumber < bookLimitR) || (bookLimitR == 0)))
 						{
 							string moves = String.Join(" ", movesUci);
 							move = Book.GetMove(moves);
